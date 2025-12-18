@@ -17,7 +17,7 @@ module.exports = {
       AUTH_URL: 'https://calendar.gabrielrevest.software',
       AUTH_TRUST_HOST: 'true',
       NEXTAUTH_URL: 'https://calendar.gabrielrevest.software',
-      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'change-me-in-production'
+      NEXTAUTH_SECRET: 'change-me-in-production-secret-key-calendar-app-2025'
     },
     error_file: './logs/pm2-error.log',
     out_file: './logs/pm2-out.log',
