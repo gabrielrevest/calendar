@@ -25,7 +25,7 @@ export async function GET() {
     
     try {
       await prisma.user.update({
-        where: { id: session.user.id },
+        where: { id: userId },
         data: { calendarToken: token },
       })
     } catch (error: any) {

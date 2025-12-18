@@ -14,9 +14,10 @@ module.exports = {
       CLERK_SECRET_KEY: 'sk_test_VFN0XYMl2fqTFRTrGYyUDDq5YVzObBsnNR5eF6LDYr',
       DATABASE_URL: 'file:./prisma/database.db',
       // Corriger l'erreur UntrustedHost de NextAuth
-      AUTH_URL: 'http://157.245.69.178',
+      AUTH_URL: 'https://calendar.gabrielrevest.software',
       AUTH_TRUST_HOST: 'true',
-      NEXTAUTH_URL: 'http://157.245.69.178'
+      NEXTAUTH_URL: 'https://calendar.gabrielrevest.software',
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'change-me-in-production'
     },
     error_file: './logs/pm2-error.log',
     out_file: './logs/pm2-out.log',
