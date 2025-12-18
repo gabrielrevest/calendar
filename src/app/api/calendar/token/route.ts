@@ -1,18 +1,18 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 import { randomBytes } from 'crypto'
 
 // Générer ou récupérer le token de calendrier
 export async function GET() {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { calendarToken: true },
     })
 
@@ -47,8 +47,8 @@ export async function GET() {
 // Régénérer le token (invalide l'ancien)
 export async function POST() {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -56,7 +56,7 @@ export async function POST() {
     
     try {
       await prisma.user.update({
-        where: { id: session.user.id },
+        where: { id: userId },
         data: { calendarToken: token },
       })
     } catch (error: any) {

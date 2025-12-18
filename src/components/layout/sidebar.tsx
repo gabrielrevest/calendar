@@ -33,6 +33,7 @@ const navigation = [
   { name: 'Notes', href: '/notes', icon: StickyNote },
   { name: 'Journal', href: '/journal', icon: BookOpen },
   { name: 'Statistiques', href: '/stats', icon: BarChart3 },
+  { name: 'Synchronisation', href: '/settings/sync', icon: Smartphone },
   { name: 'Profil', href: '/profile', icon: User },
 ]
 
