@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 import { eventSchema } from '@/lib/validations/event'
 
 export async function GET() {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const events = await prisma.event.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       select: {
         id: true,
         title: true,
@@ -56,8 +56,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -73,9 +73,9 @@ export async function POST(request: Request) {
     const validatedData = eventSchema.parse(dataToValidate)
     const { tagIds, reminders, categoryId, ...eventData } = validatedData
 
-    // Vérifier que l'utilisateur existe (PrismaAdapter le crée automatiquement lors de la connexion)
+    // Vérifier que l'utilisateur existe (Clerk le crée automatiquement lors de la connexion)
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { id: true },
     })
     if (!user) {
@@ -87,12 +87,12 @@ export async function POST(request: Request) {
     if (categoryId && categoryId !== '' && categoryId !== 'null' && categoryId !== 'undefined') {
       try {
         const category = await prisma.category.findFirst({
-          where: { id: categoryId, userId: session.user.id },
+          where: { id: categoryId, userId },
         })
         if (category) {
           validCategoryId = categoryId
         } else {
-          console.log(`Category ${categoryId} not found for user ${session.user.id}`)
+          console.log(`Category ${categoryId} not found for user ${userId}`)
         }
       } catch (error) {
         console.error('Error validating category:', error)
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
         const existingTags = await prisma.tag.findMany({
           where: {
             id: { in: tagIds },
-            userId: session.user.id,
+            userId,
           },
           select: { id: true },
         })
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
       endDate: eventData.endDate,
       allDay: eventData.allDay || false,
       location: eventData.location || null,
-      userId: session.user.id,
+      userId,
     }
 
     // Ajouter categoryId seulement si valide
@@ -147,7 +147,7 @@ export async function POST(request: Request) {
       eventDataToCreate.reminders = {
         create: reminders.map((minutes: number) => ({ 
           minutesBefore: minutes,
-          userId: session.user.id,
+          userId,
         })),
       }
     }

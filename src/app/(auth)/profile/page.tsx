@@ -6,20 +6,30 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
-import { useSession, signOut } from 'next-auth/react'
+import { useUser, useClerk } from '@clerk/nextjs'
 import { User, Mail, Calendar, Save, LogOut, Smartphone } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IPhoneSyncDialog } from '@/components/sync/iphone-sync-dialog'
 
 export default function ProfilePage() {
-  const { data: session } = useSession()
+  const { user, isLoaded } = useUser()
+  const { signOut } = useClerk()
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const [showSyncDialog, setShowSyncDialog] = useState(false)
   const [formData, setFormData] = useState({
-    name: session?.user?.name || '',
-    email: session?.user?.email || '',
+    name: '',
+    email: '',
   })
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      setFormData({
+        name: user.fullName || user.firstName || '',
+        email: user.primaryEmailAddress?.emailAddress || '',
+      })
+    }
+  }, [user, isLoaded])
 
   const updateMutation = useMutation({
     mutationFn: async (data: { name: string }) => {
@@ -135,7 +145,7 @@ export default function ProfilePage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Membre depuis</span>
                 <span className="font-medium">
-                  {session?.user?.email ? 'Aujourd\'hui' : '-'}
+                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : '-'}
                 </span>
               </div>
             </div>
@@ -154,7 +164,7 @@ export default function ProfilePage() {
             <Button
               variant="destructive"
               className="w-full"
-              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+              onClick={() => signOut({ redirectUrl: '/auth/signin' })}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Se déconnecter

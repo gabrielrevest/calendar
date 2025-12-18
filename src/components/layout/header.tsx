@@ -1,12 +1,12 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 import { useTheme } from 'next-themes'
 import { Moon, Sun, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function Header() {
-  const { data: session } = useSession()
+  const { user, isLoaded } = useUser()
   const { theme, setTheme } = useTheme()
 
   return (
@@ -31,9 +31,11 @@ export function Header() {
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
               <User className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="hidden sm:block text-sm font-medium">
-              {session?.user?.name || session?.user?.email}
-            </span>
+            {isLoaded && (
+              <span className="hidden sm:block text-sm font-medium">
+                {user?.fullName || user?.primaryEmailAddress?.emailAddress || 'Utilisateur'}
+              </span>
+            )}
           </div>
         </div>
       </div>

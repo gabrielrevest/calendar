@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut } from 'next-auth/react'
+import { useClerk } from '@clerk/nextjs'
 import { cn } from '@/lib/utils'
 import {
   Calendar,
@@ -38,6 +38,7 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { signOut } = useClerk()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [iPhoneSyncOpen, setIPhoneSyncOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -128,7 +129,7 @@ export function Sidebar() {
 
             {/* Logout */}
             <button
-              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+              onClick={() => signOut({ redirectUrl: '/auth/signin' })}
               className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
             >
               <LogOut className="h-5 w-5" />

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getSession } from '@/lib/auth'
+import { auth } from '@clerk/nextjs/server'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 
@@ -8,9 +8,9 @@ export default async function AuthLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getSession()
+  const { userId } = await auth()
   
-  if (!session) {
+  if (!userId) {
     redirect('/auth/signin')
   }
 

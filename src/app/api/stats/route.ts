@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 import { startOfMonth, endOfMonth, subMonths, format } from 'date-fns'
 
 export async function GET() {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -16,13 +16,13 @@ export async function GET() {
 
     // Total events
     const totalEvents = await prisma.event.count({
-      where: { userId: session.user.id },
+      where: { userId },
     })
 
     // Events this month
     const eventsThisMonth = await prisma.event.count({
       where: {
-        userId: session.user.id,
+        userId,
         startDate: {
           gte: startOfCurrentMonth,
           lte: endOfCurrentMonth,
@@ -37,7 +37,7 @@ export async function GET() {
       const monthEnd = endOfMonth(subMonths(now, i))
       const count = await prisma.event.count({
         where: {
-          userId: session.user.id,
+          userId,
           startDate: {
             gte: monthStart,
             lte: monthEnd,
@@ -52,12 +52,12 @@ export async function GET() {
 
     // Projects
     const totalProjects = await prisma.project.count({
-      where: { userId: session.user.id },
+      where: { userId },
     })
 
     const activeProjects = await prisma.project.count({
       where: {
-        userId: session.user.id,
+        userId,
         status: { in: ['PLANNING', 'IN_PROGRESS'] },
       },
     })
@@ -65,18 +65,18 @@ export async function GET() {
     // Projects by type
     const projectsByType = await prisma.project.groupBy({
       by: ['type'],
-      where: { userId: session.user.id },
+      where: { userId },
       _count: true,
     })
 
     // Notes
     const totalNotes = await prisma.note.count({
-      where: { userId: session.user.id },
+      where: { userId },
     })
 
     const notesThisMonth = await prisma.note.count({
       where: {
-        userId: session.user.id,
+        userId,
         createdAt: {
           gte: startOfCurrentMonth,
           lte: endOfCurrentMonth,
@@ -86,7 +86,7 @@ export async function GET() {
 
     // Words written (from projects and journal)
     const projects = await prisma.project.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       select: { wordCount: true, content: true },
     })
 
@@ -94,7 +94,7 @@ export async function GET() {
     let journalEntries: any[] = []
     try {
       journalEntries = await prisma.journalEntry.findMany({
-        where: { userId: session.user.id },
+        where: { userId },
         select: { content: true },
       })
     } catch (error) {
@@ -111,7 +111,7 @@ export async function GET() {
 
     const projectsThisMonth = await prisma.project.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         updatedAt: {
           gte: startOfCurrentMonth,
           lte: endOfCurrentMonth,
@@ -122,7 +122,7 @@ export async function GET() {
 
     const journalThisMonth = await prisma.journalEntry.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         date: {
           gte: startOfCurrentMonth,
           lte: endOfCurrentMonth,
@@ -138,7 +138,7 @@ export async function GET() {
     // Book progress
     const books = await prisma.project.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         type: 'BOOK',
         targetWords: { not: null },
       },

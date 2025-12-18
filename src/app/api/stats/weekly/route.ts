@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 import { format, eachDayOfInterval } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     // Compter les événements
     const eventsCount = await prisma.event.count({
       where: {
-        userId: session.user.id,
+        userId,
         startDate: { gte: startDate, lte: endDate },
       },
     })
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     // Compter les tâches complétées
     const completedTasks = await prisma.task.count({
       where: {
-        project: { userId: session.user.id },
+        project: { userId },
         completed: true,
         updatedAt: { gte: startDate, lte: endDate },
       },
@@ -50,14 +50,14 @@ export async function GET(request: NextRequest) {
 
         const events = await prisma.event.count({
           where: {
-            userId: session.user.id,
+            userId,
             startDate: { gte: dayStart, lte: dayEnd },
           },
         })
 
         const tasks = await prisma.task.count({
           where: {
-            project: { userId: session.user.id },
+            project: { userId },
             completed: true,
             updatedAt: { gte: dayStart, lte: dayEnd },
           },
@@ -75,14 +75,14 @@ export async function GET(request: NextRequest) {
     const eventsByCategory = await prisma.event.groupBy({
       by: ['categoryId'],
       where: {
-        userId: session.user.id,
+        userId,
         startDate: { gte: startDate, lte: endDate },
       },
       _count: true,
     })
 
     const categories = await prisma.category.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
     })
 
     const categoryData = eventsByCategory.map((item) => {
