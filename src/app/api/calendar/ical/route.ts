@@ -122,8 +122,10 @@ END:VEVENT
     return new NextResponse(ical, {
       headers: {
         'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="calendrier.ics"',
+        'Content-Disposition': 'inline; filename="calendrier.ics"',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
       },
     })
   } catch (error) {
