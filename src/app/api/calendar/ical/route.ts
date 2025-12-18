@@ -126,6 +126,7 @@ END:VEVENT
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'X-Content-Type-Options': 'nosniff',
       },
     })
   } catch (error) {

@@ -33,8 +33,15 @@ export default function SyncSettingsPage() {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['calendar-token'], data)
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-      setCalendarUrl(`${baseUrl}/api/calendar/ical?token=${data.token}`)
+      const baseUrl = typeof window !== 'undefined' 
+        ? window.location.origin 
+        : 'https://calendar.gabrielrevest.software'
+      const httpsUrl = baseUrl.startsWith('http://') 
+        ? baseUrl.replace('http://', 'https://')
+        : baseUrl.startsWith('https://') 
+          ? baseUrl 
+          : `https://${baseUrl}`
+      setCalendarUrl(`${httpsUrl}/api/calendar/ical?token=${data.token}`)
       toast({
         title: 'Token régénéré',
         description: 'Un nouveau token a été généré. Mettez à jour la configuration de votre iPhone.',
@@ -52,8 +59,17 @@ export default function SyncSettingsPage() {
   // Générer l'URL de synchronisation
   useEffect(() => {
     if (tokenData?.token) {
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-      setCalendarUrl(`${baseUrl}/api/calendar/ical?token=${tokenData.token}`)
+      // Utiliser le domaine HTTPS pour la synchronisation iPhone
+      const baseUrl = typeof window !== 'undefined' 
+        ? window.location.origin 
+        : 'https://calendar.gabrielrevest.software'
+      // S'assurer d'utiliser HTTPS
+      const httpsUrl = baseUrl.startsWith('http://') 
+        ? baseUrl.replace('http://', 'https://')
+        : baseUrl.startsWith('https://') 
+          ? baseUrl 
+          : `https://${baseUrl}`
+      setCalendarUrl(`${httpsUrl}/api/calendar/ical?token=${tokenData.token}`)
     }
   }, [tokenData])
 

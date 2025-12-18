@@ -48968,6 +48968,8 @@ Output mode: files_with_matches
 ---
 
 
+Correction de l'erreur dans `src/app/api/calendar/token/route.ts` et ajout de `NEXTAUTH_SECRET` dans `ecosystem.config.js` :
+
 
 ---
 
@@ -48994,7 +48996,85 @@ Lines added: 1, lines removed: 1
 
 ---
 
+<tool-use data-tool-type="write" data-tool-name="search_replace">
 
+<details><summary>Tool use: **search_replace** • Edit file: ecosystem.config.js</summary>
+
+**Chunk 1**
+Lines added: 3, lines removed: 2
+
+```diff
+@@ -15,7 +15,8 @@
+        DATABASE_URL: 'file:./prisma/database.db',
+        // Corriger l'erreur UntrustedHost de NextAuth
+-       AUTH_URL: 'http://157.245.69.178',
++       AUTH_URL: 'https://calendar.gabrielrevest.software',
+        AUTH_TRUST_HOST: 'true',
+-       NEXTAUTH_URL: 'http://157.245.69.178'
++       NEXTAUTH_URL: 'https://calendar.gabrielrevest.software',
++       NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'change-me-in-production'
+      },
+      error_file: './logs/pm2-error.log',
+```
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; git add -A; git commit -m "fix: Correction erreur token calendar et ajout NEXTAUTH_SECRET"; git push origin main</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; git add -A; git commit -m "fix: Correction erreur token calendar et ajout NEXTAUTH_SECRET"; git push origin main
+```
+
+```
+warning: in the working copy of 'src/app/api/calendar/ical/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/layout/sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+[main 471174b] fix: Correction erreur token calendar et ajout NEXTAUTH_SECRET
+ 4 files changed, 1230 insertions(+), 16 deletions(-)
+ create mode 100644 DEPLOY-FIX-SERVEUR.md
+To https://github.com/gabrielrevest/calendar.git
+   92cb88e..471174b  main -&gt; main
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ Corrections effectuees!" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host ""; Write-Host "1. Resoudre le conflit Git:" -ForegroundColor Yellow; Write-Host "   cp ecosystem.config.js ecosystem.config.js.backup" -ForegroundColor White; Write-Host "   rm ecosystem.config.js" -ForegroundColor White; Write-Host "   git pull" -ForegroundColor White; Write-Host ""; Write-Host "2. Ajouter NEXTAUTH_SECRET dans .env:" -ForegroundColor Yellow; Write-Host "   echo 'NEXTAUTH_SECRET=change-me-in-production' >> .env" -ForegroundColor White; Write-Host ""; Write-Host "3. Redemarrer PM2:" -ForegroundColor Yellow; Write-Host "   pm2 restart calendar-app" -ForegroundColor White; Write-Host ""; Write-Host "4. Verifier les logs:" -ForegroundColor Yellow; Write-Host "   pm2 logs calendar-app --lines 20" -ForegroundColor White</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ Corrections effectuees!" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host ""; Write-Host "1. Resoudre le conflit Git:" -ForegroundColor Yellow; Write-Host "   cp ecosystem.config.js ecosystem.config.js.backup" -ForegroundColor White; Write-Host "   rm ecosystem.config.js" -ForegroundColor White; Write-Host "   git pull" -ForegroundColor White; Write-Host ""; Write-Host "2. Ajouter NEXTAUTH_SECRET dans .env:" -ForegroundColor Yellow; Write-Host "   echo 'NEXTAUTH_SECRET=change-me-in-production' >> .env" -ForegroundColor White; Write-Host ""; Write-Host "3. Redemarrer PM2:" -ForegroundColor Yellow; Write-Host "   pm2 restart calendar-app" -ForegroundColor White; Write-Host ""; Write-Host "4. Verifier les logs:" -ForegroundColor Yellow; Write-Host "   pm2 logs calendar-app --lines 20" -ForegroundColor White
+```
+
+```
+
+�o. Corrections effectuees!
+
+Commandes a executer sur le serveur:
+
+1. Resoudre le conflit Git:
+   cp ecosystem.config.js ecosystem.config.js.backup
+   rm ecosystem.config.js
+   git pull
+
+2. Ajouter NEXTAUTH_SECRET dans .env:
+   echo 'NEXTAUTH_SECRET=change-me-in-production' &gt;&gt; .env
+
+3. Redemarrer PM2:
+   pm2 restart calendar-app
+
+4. Verifier les logs:
+   pm2 logs calendar-app --lines 20
+
+```
+</details>
+</tool-use>
 
 ---
 
@@ -49003,6 +49083,509 @@ Lines added: 1, lines removed: 1
 ---
 
 
+Corrections effectuées et pushées. Voici les commandes à exécuter sur le serveur :
+
+## Commandes à exécuter sur le serveur
+
+### 1. Résoudre le conflit Git
+
+```bash
+cd /var/www/calendar
+cp ecosystem.config.js ecosystem.config.js.backup
+rm ecosystem.config.js
+git pull
+```
+
+### 2. Ajouter NEXTAUTH_SECRET dans .env
+
+```bash
+# Ajouter NEXTAUTH_SECRET si pas déjà présent
+echo 'NEXTAUTH_SECRET=change-me-in-production' >> .env
+
+# Vérifier le contenu
+cat .env
+```
+
+### 3. Redémarrer PM2
+
+```bash
+pm2 restart calendar-app
+pm2 logs calendar-app --lines 20
+```
+
+### 4. Vérifier que l'endpoint fonctionne
+
+```bash
+# Tester l'endpoint (depuis le serveur, cela devrait retourner 401 car pas de session)
+curl http://localhost:3000/api/calendar/token
+```
+
+## Corrections apportées
+
+1. Erreur dans `/api/calendar/token` : `session.user.id` remplacé par `userId`
+2. Ajout de `NEXTAUTH_SECRET` dans `ecosystem.config.js` pour éviter les erreurs NextAuth
+3. Mise à jour des URLs en HTTPS dans `ecosystem.config.js`
+
+## Après ces étapes
+
+1. Ouvrir `https://calendar.gabrielrevest.software/settings/sync`
+2. Le lien de synchronisation devrait s'afficher
+3. Copier l'URL et l'utiliser sur iPhone
+
+Si le lien ne s'affiche toujours pas après ces corrections, vérifier les logs PM2 pour d'autres erreurs.
+
+---
+
+_**User (2025-12-18 17:32Z)**_
+
+favicon.ico:1  Failed to load resource: the server responded with a status of 404 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+api/calendar/token:1  Failed to load resource: the server responded with a status of 401 ()Comprendre cette erreur
+2013-81ec25157a18ade2.js:1  POST https://calendar.gabrielrevest.software/api/calendar/token 401 (Unauthorized)
+mutationFn @ 2013-81ec25157a18ade2.js:1
+fn @ 631-b0d9638b01e51e21.js:1
+b @ 6743-6969b3f14261a6c7.js:1
+start @ 6743-6969b3f14261a6c7.js:1
+execute @ 631-b0d9638b01e51e21.js:1
+await in execute
+mutate @ 631-b0d9638b01e51e21.js:1
+(anonyme) @ 631-b0d9638b01e51e21.js:1
+onClick @ 2013-81ec25157a18ade2.js:1
+i8 @ 4bd1b696-100b9d70ed4e49c1.js:1
+(anonyme) @ 4bd1b696-100b9d70ed4e49c1.js:1
+nz @ 4bd1b696-100b9d70ed4e49c1.js:1
+sn @ 4bd1b696-100b9d70ed4e49c1.js:1
+cc @ 4bd1b696-100b9d70ed4e49c1.js:1
+ci @ 4bd1b696-100b9d70ed4e49c1.js:1Comprendre cette erreur
+2013-81ec25157a18ade2.js:1  POST https://calendar.gabrielrevest.software/api/calendar/token 401 (Unauthorized)
+mutationFn @ 2013-81ec25157a18ade2.js:1
+fn @ 631-b0d9638b01e51e21.js:1
+b @ 6743-6969b3f14261a6c7.js:1
+start @ 6743-6969b3f14261a6c7.js:1
+execute @ 631-b0d9638b01e51e21.js:1
+await in execute
+mutate @ 631-b0d9638b01e51e21.js:1
+(anonyme) @ 631-b0d9638b01e51e21.js:1
+onClick @ 2013-81ec25157a18ade2.js:1
+i8 @ 4bd1b696-100b9d70ed4e49c1.js:1
+(anonyme) @ 4bd1b696-100b9d70ed4e49c1.js:1
+nz @ 4bd1b696-100b9d70ed4e49c1.js:1
+sn @ 4bd1b696-100b9d70ed4e49c1.js:1
+cc @ 4bd1b696-100b9d70ed4e49c1.js:1
+ci @ 4bd1b696-100b9d70ed4e49c1.js:1Comprendre cette erreur
+2013-81ec25157a18ade2.js:1  POST https://calendar.gabrielrevest.software/api/calendar/token 401 (Unauthorized)
+mutationFn @ 2013-81ec25157a18ade2.js:1
+fn @ 631-b0d9638b01e51e21.js:1
+b @ 6743-6969b3f14261a6c7.js:1
+start @ 6743-6969b3f14261a6c7.js:1
+execute @ 631-b0d9638b01e51e21.js:1
+await in execute
+mutate @ 631-b0d9638b01e51e21.js:1
+(anonyme) @ 631-b0d9638b01e51e21.js:1
+onClick @ 2013-81ec25157a18ade2.js:1
+i8 @ 4bd1b696-100b9d70ed4e49c1.js:1
+(anonyme) @ 4bd1b696-100b9d70ed4e49c1.js:1
+nz @ 4bd1b696-100b9d70ed4e49c1.js:1
+sn @ 4bd1b696-100b9d70ed4e49c1.js:1
+cc @ 4bd1b696-100b9d70ed4e49c1.js:1
+ci @ 4bd1b696-100b9d70ed4e49c1.js:1Comprendre cette erreur
+2013-81ec25157a18ade2.js:1  POST https://calendar.gabrielrevest.software/api/calendar/token 401 (Unauthorized.../2025-12-14_14-34Z-application-calendrier-et-gestion-de-projets.md      | 7582 ++++++++++++++++++++++++++++++++++
+ AJOUT-CLE-SSH-DIGITALOCEAN.md                                              |   81 +
+ DEPLOY-CLERK-AJOUTER-DOMAINE.md                                            |   65 +
+ DEPLOY-CLERK-PATHS-CONFIG.md                                               |   98 +
+ DEPLOY-COMMANDES-SERVEUR.md                                                |  202 +
+ DEPLOY-COMMANDES-SSL.md                                                    |  173 +
+ DEPLOY-ETAPES-SUIVANTES.md                                                 |  161 +
+ DEPLOY-FIX-CERTBOT-CONFIG.md                                               |  173 +
+ DEPLOY-FIX-CLERK.md                                                        |  138 +
+ DEPLOY-FIX-NEXTAUTH.md                                                     |   93 +
+ DEPLOY-FIX-NGINX-DEFAULT.md                                                |  173 +
+ DEPLOY-FIX-PRISMA.md                                                       |   96 +
+ DEPLOY-FIX-SERVEUR.md                                                      |   78 +
+ DEPLOY-PM2-NGINX.md                                                        |  161 +
+ DEPLOY-QUICKSTART.md                                                       |  195 +
+ DEPLOY-SOUS-DOMAINE.md                                                     |  261 ++
+ DEPLOY-SSL-CERTBOT.md                                                      |  143 +
+ GUIDE-SYNC-IPHONE.md                                                       |  108 +
+ ecosystem.config.js                                                        |   30 +
+ package-lock.json                                                          |    7 +
+ package.json                                                               |    1 +
+ src/app/(auth)/settings/sync/page.tsx                                      |  181 +
+ src/app/api/calendar/ical/route.ts                                         |    7 +-
+ src/app/api/calendar/token/route.ts                                        |   16 +-
+ src/components/layout/sidebar.tsx                                          |    1 +
+ text.txt                                                                   |    8 +
+ text.txt.pub                                                               |    1 +
+ 27 files changed, 10221 insertions(+), 12 deletions(-)
+ create mode 100644 AJOUT-CLE-SSH-DIGITALOCEAN.md
+ create mode 100644 DEPLOY-CLERK-AJOUTER-DOMAINE.md
+ create mode 100644 DEPLOY-CLERK-PATHS-CONFIG.md
+ create mode 100644 DEPLOY-COMMANDES-SERVEUR.md
+ create mode 100644 DEPLOY-COMMANDES-SSL.md
+ create mode 100644 DEPLOY-ETAPES-SUIVANTES.md
+ create mode 100644 DEPLOY-FIX-CERTBOT-CONFIG.md
+ create mode 100644 DEPLOY-FIX-CLERK.md
+ create mode 100644 DEPLOY-FIX-NEXTAUTH.md
+ create mode 100644 DEPLOY-FIX-NGINX-DEFAULT.md
+ create mode 100644 DEPLOY-FIX-PRISMA.md
+ create mode 100644 DEPLOY-FIX-SERVEUR.md
+ create mode 100644 DEPLOY-PM2-NGINX.md
+ create mode 100644 DEPLOY-QUICKSTART.md
+ create mode 100644 DEPLOY-SOUS-DOMAINE.md
+ create mode 100644 DEPLOY-SSL-CERTBOT.md
+ create mode 100644 GUIDE-SYNC-IPHONE.md
+ create mode 100644 ecosystem.config.js
+ create mode 100644 src/app/(auth)/settings/sync/page.tsx
+ create mode 100644 text.txt
+ create mode 100644 text.txt.pub
+root@ubuntu-s-2vcpu-4gb-ams3-01:/var/www/calendar# pm2 restart calendar-app
+pm2 logs calendar-app --lines 20
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [calendar-app](ids: [ 0 ])
+[PM2] [calendar-app](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ calendar-app       │ fork     │ 2    │ online    │ 0%       │ 18.9mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 20 lines for [calendar-app] process (change the value with --lines option)
+/var/www/calendar/logs/pm2-out.log last 20 lines:
+0|calendar | 2025-12-18 19:14:47 +00:00: Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.
+0|calendar | 2025-12-18 19:14:51 +00:00: Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.
+0|calendar | 2025-12-18 19:26:33 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:26:33 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:26:33 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:26:33 +00:00:
+0|calendar | 2025-12-18 19:26:33 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:26:33 +00:00:  ✓ Ready in 516ms
+0|calendar | 2025-12-18 19:32:20 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:32:20 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:32:20 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:32:20 +00:00:
+0|calendar | 2025-12-18 19:32:20 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:32:20 +00:00:  ✓ Ready in 606ms
+0|calendar | 2025-12-18 19:40:42 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:40:42 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:40:42 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:40:42 +00:00:
+0|calendar | 2025-12-18 19:40:42 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:40:42 +00:00:  ✓ Ready in 479ms
+
+/var/www/calendar/logs/pm2-error.log last 20 lines:
+0|calendar | 2025-12-18 19:41:08 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:41:08 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:41:10 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:41:10 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:41:10 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:41:14 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:41:14 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:41:14 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:41:19 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:41:19 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:41:19 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:41:20 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:41:20 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:41:20 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:41:31 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:41:31 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:41:31 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:41:38 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:41:38 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:41:38 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+
+0|calendar-app  | 2025-12-18 19:44:21 +00:00:    ▲ Next.js 15.5.9
+0|calendar-app  | 2025-12-18 19:44:21 +00:00:    - Local:        http://localhost:3000
+0|calendar-app  | 2025-12-18 19:44:21 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar-app  | 2025-12-18 19:44:21 +00:00:
+0|calendar-app  | 2025-12-18 19:44:21 +00:00:  ✓ Starting...
+0|calendar-app  | 2025-12-18 19:44:21 +00:00:  ⚠ "next start" does not work with "output: standalone" configuration. Use "node .next/standalone/server.js" instead.
+0|calendar-app  | 2025-12-18 19:44:21 +00:00:  ✓ Ready in 525ms
+0|calendar-app  | 2025-12-18 19:44:42 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:42 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:42 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:44 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:44 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:44 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:46 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:46 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:46 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:50 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:50 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:50 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:52 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:52 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:52 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:53 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:53 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:53 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:53 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:53 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:53 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:54 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:54 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:54 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:54 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:54 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:54 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:59 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:59 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:59 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:44:59 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:44:59 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:44:59 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:45:00 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:45:00 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:45:00 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+0|calendar-app  | 2025-12-18 19:45:01 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar-app  | 2025-12-18 19:45:01 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar-app  | 2025-12-18 19:45:01 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)     
+
+
+---
+
+_**Agent (model default, mode Agent)**_
+
+
+
+---
+
+
+Deux problèmes :
+1. 401 sur `/api/calendar/token` — Clerk ne détecte pas l'utilisateur
+2. `MissingSecret` — `NEXTAUTH_SECRET` manquant
+
+Correction en cours :
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: src/lib/auth-clerk.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: ecosystem.config.js</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="write">
+
+<details><summary>Tool use: **write** • Edit file: DEPLOY-FIX-401-TOKEN.md</summary>
+
+**Chunk 1**
+Lines added: 102, lines removed: 1
+
+```diff
+@@ -1,1 +1,102 @@
+- 
++ # 🔧 Correction erreur 401 sur /api/calendar/token
++ 
++ ## ⚠️ Problèmes
++ 
++ 1. **401 Unauthorized** sur &#96;/api/calendar/token&#96;
++ 2. **MissingSecret** pour NextAuth
++ 3. Le lien de synchronisation ne s'affiche pas
++ 
++ ## ✅ Solutions
++ 
++ ### 1. Ajouter NEXTAUTH_SECRET dans .env
++ 
++ &#96;&#96;&#96;bash
++ cd /var/www/calendar
++ nano .env
++ &#96;&#96;&#96;
++ 
++ Ajouter cette ligne :
++ &#96;&#96;&#96;env
++ NEXTAUTH_SECRET=change-me-in-production-secret-key-here
++ &#96;&#96;&#96;
++ 
++ Ou générer un secret aléatoire :
++ &#96;&#96;&#96;bash
++ openssl rand -base64 32
++ &#96;&#96;&#96;
++ 
++ Puis l'ajouter dans &#96;.env&#96; :
++ &#96;&#96;&#96;env
++ NEXTAUTH_SECRET=&lt;le-secret-genere&gt;
++ &#96;&#96;&#96;
++ 
++ ### 2. Vérifier que les clés Clerk sont correctes
++ 
++ &#96;&#96;&#96;bash
++ cat .env | grep CLERK
++ &#96;&#96;&#96;
++ 
++ Doit contenir :
++ &#96;&#96;&#96;env
++ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
++ CLERK_SECRET_KEY=sk_test_...
++ &#96;&#96;&#96;
++ 
++ ### 3. Redémarrer PM2 avec --update-env
++ 
++ **IMPORTANT** : Utiliser &#96;--update-env&#96; pour charger les nouvelles variables d'environnement depuis &#96;.env&#96; :
++ 
++ &#96;&#96;&#96;bash
++ pm2 stop calendar-app
++ pm2 delete calendar-app
++ pm2 start ecosystem.config.js --update-env
++ pm2 save
++ &#96;&#96;&#96;
++ 
++ ### 4. Vérifier que l'application fonctionne
++ 
++ &#96;&#96;&#96;bash
++ # Vérifier les logs
++ pm2 logs calendar-app --lines 30
++ 
++ # Tester l'endpoint (depuis le serveur, devrait retourner 401 car pas de session)
++ curl http://localhost:3000/api/calendar/token
++ &#96;&#96;&#96;
++ 
++ ### 5. Vérifier dans le navigateur
++ 
++ 1. Ouvrir &#96;https://calendar.gabrielrevest.software/settings/sync&#96;
++ 2. Vérifier la console du navigateur (F12)
++ 3. Le lien devrait s'afficher si l'authentification Clerk fonctionne
++ 
++ ## 🔍 Si ça ne fonctionne toujours pas
++ 
++ ### Vérifier que Clerk fonctionne
++ 
++ &#96;&#96;&#96;bash
++ # Vérifier les logs pour les erreurs Clerk
++ pm2 logs calendar-app --err --lines 50 | grep -i clerk
++ &#96;&#96;&#96;
++ 
++ ### Vérifier que l'utilisateur est bien authentifié
++ 
++ Dans la console du navigateur, vérifier :
++ - Les cookies Clerk sont présents
++ - Pas d'erreurs de redirection infinie
++ - L'utilisateur est bien connecté
++ 
++ ### Tester l'authentification directement
++ 
++ Ouvrir dans le navigateur :
++ - &#96;https://calendar.gabrielrevest.software/dashboard&#96; (doit fonctionner si connecté)
++ - &#96;https://calendar.gabrielrevest.software/api/calendar/token&#96; (doit retourner 401 si pas connecté, ou JSON avec token si connecté)
++ 
++ ## 📝 Note importante
++ 
++ Le problème peut venir du fait que :
++ 1. Les variables d'environnement ne sont pas chargées correctement par PM2
++ 2. Clerk n'est pas configuré correctement dans le Dashboard
++ 3. Le middleware Clerk bloque l'accès à l'API
++ 
++ Vérifier que le middleware Clerk autorise l'accès à &#96;/api/calendar/token&#96; pour les utilisateurs authentifiés.
++ 
+```
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: src/middleware.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="search_replace">
+
+<details><summary>Tool use: **search_replace** • Edit file: src/middleware.ts</summary>
+
+**Chunk 1**
+Lines added: 1, lines removed: undefined
+
+```diff
+@@ -6,4 +6,5 @@
+    '/auth/signin(.*)',
+    '/api/webhooks(.*)',
++   '/api/calendar/ical(.*)', // iCal endpoint accessible avec token
+  ]);
+  
+```
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; git add -A; git commit -m "fix: Autoriser acces iCal endpoint et ajouter guide correction 401"; git push origin main</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; git add -A; git commit -m "fix: Autoriser acces iCal endpoint et ajouter guide correction 401"; git push origin main
+```
+
+```
+[main 31a6848] fix: Autoriser acces iCal endpoint et ajouter guide correction 401
+ 3 files changed, 367 insertions(+)
+ create mode 100644 DEPLOY-FIX-401-TOKEN.md
+To https://github.com/gabrielrevest/calendar.git
+   471174b..31a6848  main -&gt; main
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ Corrections effectuees!" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host ""; Write-Host "1. Ajouter NEXTAUTH_SECRET dans .env:" -ForegroundColor Yellow; Write-Host "   cd /var/www/calendar" -ForegroundColor White; Write-Host "   echo 'NEXTAUTH_SECRET=change-me-in-production' >> .env" -ForegroundColor White; Write-Host ""; Write-Host "2. Git pull:" -ForegroundColor Yellow; Write-Host "   git pull" -ForegroundColor White; Write-Host ""; Write-Host "3. Redemarrer PM2 avec --update-env (IMPORTANT):" -ForegroundColor Yellow; Write-Host "   pm2 stop calendar-app" -ForegroundColor White; Write-Host "   pm2 delete calendar-app" -ForegroundColor White; Write-Host "   pm2 start ecosystem.config.js --update-env" -ForegroundColor White; Write-Host "   pm2 save" -ForegroundColor White; Write-Host ""; Write-Host "4. Verifier les logs:" -ForegroundColor Yellow; Write-Host "   pm2 logs calendar-app --lines 20" -ForegroundColor White; Write-Host ""; Write-Host "Le --update-env est CRITIQUE pour charger les variables!" -ForegroundColor Red</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ Corrections effectuees!" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host ""; Write-Host "1. Ajouter NEXTAUTH_SECRET dans .env:" -ForegroundColor Yellow; Write-Host "   cd /var/www/calendar" -ForegroundColor White; Write-Host "   echo 'NEXTAUTH_SECRET=change-me-in-production' >> .env" -ForegroundColor White; Write-Host ""; Write-Host "2. Git pull:" -ForegroundColor Yellow; Write-Host "   git pull" -ForegroundColor White; Write-Host ""; Write-Host "3. Redemarrer PM2 avec --update-env (IMPORTANT):" -ForegroundColor Yellow; Write-Host "   pm2 stop calendar-app" -ForegroundColor White; Write-Host "   pm2 delete calendar-app" -ForegroundColor White; Write-Host "   pm2 start ecosystem.config.js --update-env" -ForegroundColor White; Write-Host "   pm2 save" -ForegroundColor White; Write-Host ""; Write-Host "4. Verifier les logs:" -ForegroundColor Yellow; Write-Host "   pm2 logs calendar-app --lines 20" -ForegroundColor White; Write-Host ""; Write-Host "Le --update-env est CRITIQUE pour charger les variables!" -ForegroundColor Red
+```
+
+```
+
+�o. Corrections effectuees!
+
+Commandes a executer sur le serveur:
+
+1. Ajouter NEXTAUTH_SECRET dans .env:
+   cd /var/www/calendar
+   echo 'NEXTAUTH_SECRET=change-me-in-production' &gt;&gt; .env
+
+2. Git pull:
+   git pull
+
+3. Redemarrer PM2 avec --update-env (IMPORTANT):
+   pm2 stop calendar-app
+   pm2 delete calendar-app
+   pm2 start ecosystem.config.js --update-env
+   pm2 save
+
+4. Verifier les logs:
+   pm2 logs calendar-app --lines 20
+
+Le --update-env est CRITIQUE pour charger les variables!
+
+```
+</details>
+</tool-use>
 
 ---
 
@@ -49011,6 +49594,682 @@ Lines added: 1, lines removed: 1
 ---
 
 
+Le problème vient de PM2 qui ne charge pas les variables d'environnement depuis `.env`. Voici les commandes à exécuter sur le serveur :
+
+## Commandes à exécuter sur le serveur
+
+### 1. Ajouter NEXTAUTH_SECRET dans .env
+
+```bash
+cd /var/www/calendar
+echo 'NEXTAUTH_SECRET=change-me-in-production-secret-key' >> .env
+```
+
+### 2. Mettre à jour le code
+
+```bash
+git pull
+npm run build
+```
+
+### 3. Redémarrer PM2 avec --update-env
+
+Important : utiliser `--update-env` pour charger les nouvelles variables :
+
+```bash
+pm2 stop calendar-app
+pm2 delete calendar-app
+pm2 start ecosystem.config.js --update-env
+pm2 save
+```
+
+### 4. Vérifier les logs
+
+```bash
+pm2 logs calendar-app --lines 30
+```
+
+## Note importante
+
+Le `--update-env` est nécessaire, mais PM2 ne charge pas automatiquement le `.env`. Si cela ne fonctionne pas, mettre `NEXTAUTH_SECRET` directement dans `ecosystem.config.js` :
+
+```bash
+nano ecosystem.config.js
+```
+
+Et remplacer la ligne :
+```javascript
+NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'change-me-in-production'
+```
+
+Par :
+```javascript
+NEXTAUTH_SECRET: 'change-me-in-production-secret-key-here'
+```
+
+Puis redémarrer :
+```bash
+pm2 restart calendar-app
+```
+
+## Vérification
+
+Après ces étapes :
+1. Ouvrir `https://calendar.gabrielrevest.software/settings/sync`
+2. Le lien de synchronisation devrait s'afficher
+3. Plus d'erreurs 401 dans la console
+
+Si le problème persiste, vérifier que vous êtes bien connecté avec Clerk (vérifier les cookies dans la console du navigateur).
+
+---
+
+_**User (2025-12-18 17:32Z)**_
+
+root@ubuntu-s-2vcpu-4gb-ams3-01:/var/www/calendar# cd /var/www/calendar
+echo 'NEXTAUTH_SECRET=change-me-in-production-secret-key' >> .env
+root@ubuntu-s-2vcpu-4gb-ams3-01:/var/www/calendar# git pull
+npm run build
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 8 (delta 5), reused 8 (delta 5), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 3.30 KiB | 48.00 KiB/s, done.
+From https://github.com/gabrielrevest/calendar
+   471174b..31a6848  main       -> origin/main
+Updating 471174b..31a6848
+Fast-forward
+ .../2025-12-14_14-34Z-application-calendrier-et-gestion-de-projets.md      | 264 +++++++++++++++++++++++++++++++++++
+ DEPLOY-FIX-401-TOKEN.md                                                    | 102 ++++++++++++++
+ src/middleware.ts                                                          |   1 +
+ 3 files changed, 367 insertions(+)
+ create mode 100644 DEPLOY-FIX-401-TOKEN.md
+
+> calendar-app@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.9
+   - Environments: .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (181kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled successfully in 25.0s
+   Skipping validation of types
+   Skipping linting
+ ✓ Collecting page data    
+ ✓ Generating static pages (45/45)
+ ✓ Collecting build traces    
+ ✓ Finalizing page optimization    
+
+Route (app)                                          Size  First Load JS    
+┌ ƒ /                                               265 B         102 kB
+├ ○ /_not-found                                      1 kB         103 kB
+├ ƒ /api/archive                                    265 B         102 kB
+├ ƒ /api/archive/[id]/unarchive                     265 B         102 kB
+├ ƒ /api/attachments                                265 B         102 kB
+├ ƒ /api/attachments/[id]                           265 B         102 kB
+├ ƒ /api/auth/[...nextauth]                         265 B         102 kB
+├ ƒ /api/auth/register                              265 B         102 kB
+├ ƒ /api/backup                                     265 B         102 kB
+├ ƒ /api/calendar/ical                              265 B         102 kB
+├ ƒ /api/calendar/token                             265 B         102 kB
+├ ƒ /api/calendars                                  265 B         102 kB
+├ ƒ /api/categories                                 265 B         102 kB
+├ ƒ /api/categories/[id]                            265 B         102 kB
+├ ƒ /api/events                                     265 B         102 kB
+├ ƒ /api/events/[id]                                265 B         102 kB
+├ ƒ /api/events/[id]/duplicate                      265 B         102 kB
+├ ƒ /api/events/bulk                                265 B         102 kB
+├ ƒ /api/events/recurring                           265 B         102 kB
+├ ƒ /api/export                                     265 B         102 kB
+├ ƒ /api/filters                                    265 B         102 kB
+├ ƒ /api/filters/[id]                               265 B         102 kB
+├ ƒ /api/habits                                     265 B         102 kB
+├ ƒ /api/habits/[id]                                265 B         102 kB
+├ ƒ /api/habits/[id]/toggle                         265 B         102 kB
+├ ƒ /api/import/ical                                265 B         102 kB
+├ ƒ /api/journal                                    265 B         102 kB
+├ ƒ /api/journal/[id]                               265 B         102 kB
+├ ƒ /api/milestones/[id]                            265 B         102 kB
+├ ƒ /api/notes                                      265 B         102 kB
+├ ƒ /api/notes/[id]                                 265 B         102 kB
+├ ƒ /api/notes/[id]/versions                        265 B         102 kB
+├ ƒ /api/notes/[id]/versions/[versionId]/restore    265 B         102 kB
+├ ƒ /api/notifications/settings                     265 B         102 kB
+├ ƒ /api/projects                                   265 B         102 kB
+├ ƒ /api/projects/[id]                              265 B         102 kB
+├ ƒ /api/projects/[id]/chapters                     265 B         102 kB
+├ ƒ /api/projects/[id]/milestones                   265 B         102 kB
+├ ƒ /api/projects/[id]/tasks                        265 B         102 kB
+├ ƒ /api/reminders                                  265 B         102 kB
+├ ƒ /api/search                                     265 B         102 kB
+├ ƒ /api/snapshots                                  265 B         102 kB
+├ ƒ /api/stats                                      265 B         102 kB
+├ ƒ /api/stats/heatmap                              265 B         102 kB
+├ ƒ /api/stats/weekly                               265 B         102 kB
+├ ƒ /api/tags                                       265 B         102 kB
+├ ƒ /api/tasks/[id]                                 265 B         102 kB
+├ ƒ /api/templates                                  265 B         102 kB
+├ ƒ /api/time-blocks                                265 B         102 kB
+├ ƒ /api/time-blocks/[id]                           265 B         102 kB
+├ ƒ /api/trash                                      265 B         102 kB
+├ ƒ /api/trash/[id]                                 265 B         102 kB
+├ ƒ /api/trash/[id]/restore                         265 B         102 kB
+├ ƒ /api/user/profile                               265 B         102 kB
+├ ƒ /api/views                                      265 B         102 kB
+├ ƒ /api/views/[id]                                 265 B         102 kB
+├ ƒ /appointments                                 3.42 kB         131 kB
+├ ○ /auth/signin                                  24.5 kB         168 kB
+├ ƒ /calendar                                        8 kB         187 kB
+├ ƒ /dashboard                                    2.08 kB         130 kB
+├ ƒ /journal                                      3.56 kB         131 kB
+├ ƒ /notes                                        5.25 kB         194 kB
+├ ƒ /profile                                      3.27 kB         169 kB
+├ ƒ /projects                                     7.18 kB         199 kB
+├ ƒ /projects/[id]/write                          6.97 kB         143 kB
+├ ƒ /settings/sync                                4.16 kB         124 kB
+└ ƒ /stats                                         119 kB         236 kB
++ First Load JS shared by all                      102 kB
+  ├ chunks/1255-8befde0980f5cba9.js               45.6 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js           54.2 kB
+  └ other shared chunks (total)                   2.01 kB
+
+
+ƒ Middleware                                      82.5 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+root@ubuntu-s-2vcpu-4gb-ams3-01:/var/www/calendar# pm2 stop calendar-app
+pm2 delete calendar-app
+pm2 start ecosystem.config.js --update-env
+pm2 save
+[PM2] Applying action stopProcessId on app [calendar-app](ids: [ 0 ])
+[PM2] [calendar-app](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ calendar-app       │ fork     │ 2    │ stopped   │ 0%       │ 0b       │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Applying action deleteProcessId on app [calendar-app](ids: [ 0 ])
+[PM2] [calendar-app](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2][WARN] Applications calendar-app not running, starting...
+[PM2] App [calendar-app] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ calendar-app       │ fork     │ 0    │ online    │ 0%       │ 16.9mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+root@ubuntu-s-2vcpu-4gb-ams3-01:/var/www/calendar# pm2 logs calendar-app --lines 30
+[TAILING] Tailing last 30 lines for [calendar-app] process (change the value with --lines option)
+/var/www/calendar/logs/pm2-error.log last 30 lines:
+0|calendar | 2025-12-18 19:44:50 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:50 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:44:52 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:44:52 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:52 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:44:53 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:44:53 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:53 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:44:53 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:44:53 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:53 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:44:54 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:44:54 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:54 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:44:54 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:44:54 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:54 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:44:59 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:44:59 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:59 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:44:59 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:44:59 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:44:59 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:45:00 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:45:00 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:45:00 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:45:01 +00:00: [auth][error] MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+0|calendar | 2025-12-18 19:45:01 +00:00:     at /var/www/calendar/.next/server/chunks/3900.js:404:51387
+0|calendar | 2025-12-18 19:45:01 +00:00:     at fs (/var/www/calendar/.next/server/chunks/3900.js:404:53977)
+0|calendar | 2025-12-18 19:50:50 +00:00:  ⚠ "next start" does not work with "output: standalone" configuration. Use "node .next/standalone/server.js" instead.
+
+/var/www/calendar/logs/pm2-out.log last 30 lines:
+0|calendar | 2025-12-18 19:26:33 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:26:33 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:26:33 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:26:33 +00:00:
+0|calendar | 2025-12-18 19:26:33 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:26:33 +00:00:  ✓ Ready in 516ms
+0|calendar | 2025-12-18 19:32:20 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:32:20 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:32:20 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:32:20 +00:00:
+0|calendar | 2025-12-18 19:32:20 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:32:20 +00:00:  ✓ Ready in 606ms
+0|calendar | 2025-12-18 19:40:42 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:40:42 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:40:42 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:40:42 +00:00:
+0|calendar | 2025-12-18 19:40:42 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:40:42 +00:00:  ✓ Ready in 479ms
+0|calendar | 2025-12-18 19:44:21 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:44:21 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:44:21 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:44:21 +00:00:
+0|calendar | 2025-12-18 19:44:21 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:44:21 +00:00:  ✓ Ready in 525ms
+0|calendar | 2025-12-18 19:50:50 +00:00:    ▲ Next.js 15.5.9
+0|calendar | 2025-12-18 19:50:50 +00:00:    - Local:        http://localhost:3000
+0|calendar | 2025-12-18 19:50:50 +00:00:    - Network:      http://157.245.69.178:3000
+0|calendar | 2025-12-18 19:50:50 +00:00:
+0|calendar | 2025-12-18 19:50:50 +00:00:  ✓ Starting...
+0|calendar | 2025-12-18 19:50:50 +00:00:  ✓ Ready in 586ms
+
+
+
+---
+
+_**Agent (model default, mode Agent)**_
+
+
+
+---
+
+
+Les erreurs `MissingSecret` persistent car PM2 ne charge pas automatiquement le `.env`. Ajoutons `NEXTAUTH_SECRET` directement dans `ecosystem.config.js` :
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: ecosystem.config.js</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="search_replace">
+
+<details><summary>Tool use: **search_replace** • Edit file: ecosystem.config.js</summary>
+
+**Chunk 1**
+Lines added: 1, lines removed: 1
+
+```diff
+@@ -18,5 +18,5 @@
+        AUTH_TRUST_HOST: 'true',
+        NEXTAUTH_URL: 'https://calendar.gabrielrevest.software',
+-       NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'change-me-in-production'
++       NEXTAUTH_SECRET: 'change-me-in-production-secret-key-calendar-app-2025'
+      },
+      error_file: './logs/pm2-error.log',
+```
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; git add ecosystem.config.js; git commit -m "fix: Ajouter NEXTAUTH_SECRET directement dans ecosystem.config.js"; git push origin main</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; git add ecosystem.config.js; git commit -m "fix: Ajouter NEXTAUTH_SECRET directement dans ecosystem.config.js"; git push origin main
+```
+
+```
+[main eb6677c] fix: Ajouter NEXTAUTH_SECRET directement dans ecosystem.config.js
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+To https://github.com/gabrielrevest/calendar.git
+   31a6848..eb6677c  main -&gt; main
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ NEXTAUTH_SECRET ajoute dans ecosystem.config.js" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host ""; Write-Host "1. Git pull:" -ForegroundColor Yellow; Write-Host "   git pull" -ForegroundColor White; Write-Host ""; Write-Host "2. Redemarrer PM2:" -ForegroundColor Yellow; Write-Host "   pm2 restart calendar-app" -ForegroundColor White; Write-Host ""; Write-Host "3. Verifier les logs:" -ForegroundColor Yellow; Write-Host "   pm2 logs calendar-app --err --lines 10" -ForegroundColor White; Write-Host ""; Write-Host "Les erreurs MissingSecret devraient disparaitre!" -ForegroundColor Green</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ NEXTAUTH_SECRET ajoute dans ecosystem.config.js" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host ""; Write-Host "1. Git pull:" -ForegroundColor Yellow; Write-Host "   git pull" -ForegroundColor White; Write-Host ""; Write-Host "2. Redemarrer PM2:" -ForegroundColor Yellow; Write-Host "   pm2 restart calendar-app" -ForegroundColor White; Write-Host ""; Write-Host "3. Verifier les logs:" -ForegroundColor Yellow; Write-Host "   pm2 logs calendar-app --err --lines 10" -ForegroundColor White; Write-Host ""; Write-Host "Les erreurs MissingSecret devraient disparaitre!" -ForegroundColor Green
+```
+
+```
+
+�o. NEXTAUTH_SECRET ajoute dans ecosystem.config.js
+
+Commandes a executer sur le serveur:
+
+1. Git pull:
+   git pull
+
+2. Redemarrer PM2:
+   pm2 restart calendar-app
+
+3. Verifier les logs:
+   pm2 logs calendar-app --err --lines 10
+
+Les erreurs MissingSecret devraient disparaitre!
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+J'ai ajouté `NEXTAUTH_SECRET` directement dans `ecosystem.config.js`. Exécutez ces commandes sur le serveur :
+
+## Commandes à exécuter
+
+```bash
+cd /var/www/calendar
+git pull
+pm2 restart calendar-app
+pm2 logs calendar-app --err --lines 10
+```
+
+Les erreurs `MissingSecret` devraient disparaître.
+
+## Pour le problème 401 sur `/api/calendar/token`
+
+Si l'erreur 401 persiste, vérifiez :
+
+1. **Vous êtes bien connecté** : Ouvrez `https://calendar.gabrielrevest.software/dashboard` et vérifiez que vous êtes connecté.
+
+2. **Vérifier les clés Clerk** :
+```bash
+cat .env | grep CLERK
+```
+
+3. **Tester l'endpoint directement** :
+   - Ouvrez la console du navigateur (F12)
+   - Allez sur `https://calendar.gabrielrevest.software/settings/sync`
+   - Vérifiez les erreurs dans la console
+
+4. **Vérifier que Clerk fonctionne** :
+   - Les cookies Clerk doivent être présents
+   - Pas de boucle de redirection
+
+Après le `git pull` et le redémarrage, les erreurs `MissingSecret` devraient disparaître. Si le 401 persiste, c'est probablement un problème d'authentification Clerk. Dites-moi ce que vous voyez dans les logs après le redémarrage.
+
+---
+
+_**User (2025-12-18 17:32Z)**_
+
+sur mon iphone ce lien https://calendar.gabrielrevest.software/api/calendar/ical?token=6b6b69022bb8c13199568c79c3494331f7a515acde403ef8c843bb7144d549ca  me dis safari ne peut pas télécharger ce fichier
+
+---
+
+_**Agent (model default, mode Agent)**_
+
+
+
+---
+
+
+Safari ne reconnaît pas le fichier comme un calendrier. Vérifions et corrigeons les en-têtes HTTP de l'endpoint iCal pour qu'iPhone puisse s'y abonner :
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: src/app/api/calendar/ical/route.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="codebase_search">
+<details>
+                <summary>Tool use: **codebase_search** • Searched codebase "How should iCal files be served for iPhone calendar subscription with proper headers?" • **10** results</summary>
+            
+| File | Lines |
+|------|-------|
+| `src/app/(auth)/calendar/page.tsx` | L190 |
+| `package.json` | L52-116 |
+| `electron-main.js` | L27-200 |
+| `scripts/server.js` | L26 |
+| `next.config.js` | L20 |
+| `src/components/calendar/calendar-view.tsx` | L27-324 |
+| `package.json` | L56 |
+| `src/app/layout.tsx` | L43 |
+| `src/components/layout/sidebar.tsx` | L37 |
+| `src/app/api/auth/[...nextauth]/route.ts` | L2 |
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="search_replace">
+
+<details><summary>Tool use: **search_replace** • Edit file: src/app/api/calendar/ical/route.ts</summary>
+
+**Chunk 1**
+Lines added: 3, lines removed: 1
+
+```diff
+@@ -123,6 +123,8 @@
+        headers: {
+          'Content-Type': 'text/calendar; charset=utf-8',
+-         'Content-Disposition': 'attachment; filename="calendrier.ics"',
++         'Content-Disposition': 'inline; filename="calendrier.ics"',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
++         'Access-Control-Allow-Origin': '*',
++         'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        },
+      })
+```
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; git add src/app/api/calendar/ical/route.ts; git commit -m "fix: Corriger headers iCal pour abonnement iPhone Safari"; git push origin main</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; git add src/app/api/calendar/ical/route.ts; git commit -m "fix: Corriger headers iCal pour abonnement iPhone Safari"; git push origin main
+```
+
+```
+warning: in the working copy of 'src/app/api/calendar/ical/route.ts', LF will be replaced by CRLF the next time Git touches it
+[main 8888276] fix: Corriger headers iCal pour abonnement iPhone Safari
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+To https://github.com/gabrielrevest/calendar.git
+   eb6677c..8888276  main -&gt; main
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="write">
+
+<details><summary>Tool use: **write** • Edit file: DEPLOY-FIX-ICAL-IPHONE.md</summary>
+
+**Chunk 1**
+Lines added: 76, lines removed: 1
+
+```diff
+@@ -1,1 +1,76 @@
+- 
++ # 🔧 Correction : Safari ne peut pas télécharger le fichier iCal
++ 
++ ## ⚠️ Problème
++ 
++ Safari sur iPhone affiche : "Safari ne peut pas télécharger ce fichier" quand on essaie d'abonner au calendrier.
++ 
++ ## ✅ Solution
++ 
++ Le problème vient des headers HTTP de l'endpoint iCal. Safari/iPhone a besoin de :
++ - &#96;Content-Disposition: inline&#96; (pas &#96;attachment&#96;)
++ - Headers CORS corrects
++ 
++ ## 🔄 Mise à jour sur le serveur
++ 
++ &#96;&#96;&#96;bash
++ cd /var/www/calendar
++ git pull
++ npm run build
++ pm2 restart calendar-app
++ &#96;&#96;&#96;
++ 
++ ## 📱 Comment abonner sur iPhone
++ 
++ ### Méthode 1 : Via Réglages (Recommandé)
++ 
++ 1. Ouvrez **Réglages** sur iPhone
++ 2. Allez dans **Calendrier** → **Comptes**
++ 3. Appuyez sur **Ajouter un compte**
++ 4. Sélectionnez **Autre**
++ 5. Choisissez **Ajouter un calendrier avec abonnement**
++ 6. Collez l'URL : &#96;https://calendar.gabrielrevest.software/api/calendar/ical?token=VOTRE_TOKEN&#96;
++ 7. Appuyez sur **Suivant**
++ 8. Le calendrier sera ajouté
++ 
++ ### Méthode 2 : Via Safari (si la méthode 1 ne fonctionne pas)
++ 
++ 1. Ouvrez **Safari** sur iPhone
++ 2. Collez l'URL dans la barre d'adresse
++ 3. Appuyez sur **Entrée**
++ 4. Si Safari demande, appuyez sur **Abonner** ou **Télécharger**
++ 5. Le calendrier sera ajouté à l'app Calendrier
++ 
++ ### Méthode 3 : Via l'app Mail (alternative)
++ 
++ 1. Envoyez-vous l'URL par email
++ 2. Ouvrez l'email sur iPhone
++ 3. Cliquez sur le lien
++ 4. iPhone proposera d'ajouter le calendrier
++ 
++ ## 🔍 Vérification
++ 
++ Après avoir ajouté le calendrier :
++ 1. Ouvrez l'app **Calendrier** sur iPhone
++ 2. Vérifiez que le calendrier "Mon Calendrier" apparaît
++ 3. Les événements de votre application web devraient apparaître
++ 
++ ## ⚠️ Si ça ne fonctionne toujours pas
++ 
++ 1. **Vérifier que l'URL est accessible** :
++    - Ouvrir l'URL dans un navigateur desktop
++    - Le fichier iCal devrait se télécharger ou s'afficher
++ 
++ 2. **Vérifier le token** :
++    - Le token doit être valide
++    - Régénérer le token si nécessaire depuis &#96;/settings/sync&#96;
++ 
++ 3. **Vérifier les headers** :
++    &#96;&#96;&#96;bash
++    curl -I "https://calendar.gabrielrevest.software/api/calendar/ical?token=VOTRE_TOKEN"
++    &#96;&#96;&#96;
++    Doit retourner &#96;Content-Type: text/calendar&#96;
++ 
++ ## 📝 Note
++ 
++ L'URL de synchronisation est personnelle et unique. Ne la partagez pas avec d'autres personnes.
++ 
+```
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ Headers iCal corriges!" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host "   git pull" -ForegroundColor White; Write-Host "   npm run build" -ForegroundColor White; Write-Host "   pm2 restart calendar-app" -ForegroundColor White; Write-Host ""; Write-Host "Ensuite, sur iPhone:" -ForegroundColor Yellow; Write-Host "   Reglages > Calendrier > Comptes > Ajouter un compte > Autre" -ForegroundColor White; Write-Host "   > Ajouter un calendrier avec abonnement" -ForegroundColor White; Write-Host "   > Coller l'URL" -ForegroundColor White</summary>
+
+```bash
+cd C:\Users\lerev\MesProjets\maman\calendrier; Write-Host ""; Write-Host "✅ Headers iCal corriges!" -ForegroundColor Green; Write-Host ""; Write-Host "Commandes a executer sur le serveur:" -ForegroundColor Cyan; Write-Host "   git pull" -ForegroundColor White; Write-Host "   npm run build" -ForegroundColor White; Write-Host "   pm2 restart calendar-app" -ForegroundColor White; Write-Host ""; Write-Host "Ensuite, sur iPhone:" -ForegroundColor Yellow; Write-Host "   Reglages > Calendrier > Comptes > Ajouter un compte > Autre" -ForegroundColor White; Write-Host "   > Ajouter un calendrier avec abonnement" -ForegroundColor White; Write-Host "   > Coller l'URL" -ForegroundColor White
+```
+
+```
+
+�o. Headers iCal corriges!
+
+Commandes a executer sur le serveur:
+   git pull
+   npm run build
+   pm2 restart calendar-app
+
+Ensuite, sur iPhone:
+   Reglages &gt; Calendrier &gt; Comptes &gt; Ajouter un compte &gt; Autre
+   &gt; Ajouter un calendrier avec abonnement
+   &gt; Coller l'URL
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+Headers iCal corrigés. Le problème venait de `Content-Disposition: attachment`, qui force le téléchargement au lieu de l’abonnement.
+
+## Commandes sur le serveur
+
+```bash
+cd /var/www/calendar
+git pull
+npm run build
+pm2 restart calendar-app
+```
+
+## Sur iPhone : méthode recommandée
+
+Au lieu d’utiliser Safari directement, utilisez les Réglages :
+
+1. Ouvrez Réglages sur iPhone
+2. Allez dans Calendrier → Comptes
+3. Appuyez sur Ajouter un compte
+4. Sélectionnez Autre
+5. Choisissez Ajouter un calendrier avec abonnement
+6. Collez l’URL : `https://calendar.gabrielrevest.software/api/calendar/ical?token=6b6b69022bb8c13199568c79c3494331f7a515acde403ef8c843bb7144d549ca`
+7. Appuyez sur Suivant
+8. Le calendrier sera ajouté
+
+## Pourquoi cette méthode
+
+- Safari peut bloquer certains téléchargements
+- Les Réglages gèrent mieux les abonnements de calendrier
+- Plus fiable pour la synchronisation automatique
+
+## Vérification
+
+Après l’ajout :
+1. Ouvrez l’app Calendrier sur iPhone
+2. Vérifiez que le calendrier "Mon Calendrier" apparaît dans la liste
+3. Les événements de votre application web devraient apparaître
+
+Si vous avez des événements dans votre application web, ils devraient apparaître dans l’app Calendrier après la synchronisation (automatique toutes les 15 minutes environ).
+
+Guide détaillé dans `DEPLOY-FIX-ICAL-IPHONE.md`.
 
 ---
 
