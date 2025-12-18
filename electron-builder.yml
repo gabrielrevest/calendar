@@ -1,0 +1,59 @@
+appId: com.calendrier.app
+productName: Calendrier & Projets
+copyright: Copyright 2024
+
+directories:
+  output: dist
+  buildResources: build
+
+# Ne pas utiliser asar pour que Next.js puisse accéder aux fichiers
+asar: false
+
+files:
+  - electron-main.js
+  - package.json
+  - "!src/**/*"
+  - "!prisma/database.db"
+  - "!.env*"
+  - "!*.md"
+  - "!tsconfig.json"
+  - "!tailwind.config.ts"
+  - "!postcss.config.mjs"
+  - "!components.json"
+  - "!.git/**/*"
+  - "!.cursor/**/*"
+
+extraResources:
+  - from: .next/standalone
+    to: app
+    filter:
+      - "**/*"
+  - from: .next/static
+    to: app/.next/static
+    filter:
+      - "**/*"
+  - from: public
+    to: app/public
+    filter:
+      - "**/*"
+  - from: prisma/schema.prisma
+    to: prisma/schema.prisma
+
+win:
+  target: dir
+  icon: build/icon.ico
+  sign: null
+  signingHashAlgorithms: null
+  certificateFile: null
+  certificatePassword: null
+  certificateSubjectName: null
+  certificateSha1: null
+  rfc3161TimeStampServer: null
+  timeStampServer: null
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Calendrier & Projets
