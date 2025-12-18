@@ -48750,3 +48750,267 @@ _**Agent (model default, mode Agent)**_
 
 ---
 
+
+Correction de plusieurs points :
+1. Conflit Git avec `ecosystem.config.js`
+2. Lien manquant dans la page de synchronisation
+3. Erreurs NextAuth (MissingSecret)
+
+Correction en cours :
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: src/app/(auth)/settings/sync/page.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="codebase_search">
+<details>
+                <summary>Tool use: **codebase_search** • Searched codebase "Where is NextAuth secret still being used or required?" • **10** results</summary>
+            
+| File | Lines |
+|------|-------|
+| `src/lib/auth.ts` | L78 |
+| `src/app/api/auth/[...nextauth]/route.ts` | L2 |
+| `src/lib/auth.ts` | L7-89 |
+| `src/app/api/auth/[...nextauth]/route.ts` | L17-28 |
+| `src/lib/auth.ts` | L80-89 |
+| `package.json` | L56 |
+| `src/app/auth/signin/page.tsx` | L77 |
+| `src/app/page.tsx` | L11 |
+| `src/components/providers.tsx` | L30 |
+| `next.config.js` | L20 |
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: src/app/api/calendar/token/route.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="write">
+
+<details><summary>Tool use: **write** • Edit file: DEPLOY-FIX-SERVEUR.md</summary>
+
+**Chunk 1**
+Lines added: 78, lines removed: 1
+
+```diff
+@@ -1,1 +1,78 @@
+- 
++ # 🔧 Corrections à faire sur le serveur
++ 
++ ## ⚠️ Problèmes détectés
++ 
++ 1. **Conflit Git** : &#96;ecosystem.config.js&#96; existe déjà sur le serveur
++ 2. **Lien manquant** : La page de synchronisation ne charge pas le lien
++ 3. **Erreurs NextAuth** : &#96;MissingSecret&#96; (mais on utilise Clerk maintenant)
++ 
++ ## ✅ Solutions
++ 
++ ### 1. Résoudre le conflit Git
++ 
++ &#96;&#96;&#96;bash
++ cd /var/www/calendar
++ 
++ # Sauvegarder le fichier local
++ cp ecosystem.config.js ecosystem.config.js.backup
++ 
++ # Supprimer le fichier local (il sera recréé depuis git)
++ rm ecosystem.config.js
++ 
++ # Faire le pull
++ git pull
++ 
++ # Si besoin, restaurer les modifications locales
++ # (mais normalement le fichier dans git devrait être bon)
++ &#96;&#96;&#96;
++ 
++ ### 2. Vérifier que le fichier .env contient les bonnes variables
++ 
++ &#96;&#96;&#96;bash
++ cat .env
++ &#96;&#96;&#96;
++ 
++ Doit contenir au minimum :
++ &#96;&#96;&#96;env
++ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
++ CLERK_SECRET_KEY=sk_test_...
++ DATABASE_URL="file:./prisma/database.db"
++ NODE_ENV=production
++ PORT=3000
++ AUTH_URL=https://calendar.gabrielrevest.software
++ AUTH_TRUST_HOST=true
++ NEXTAUTH_URL=https://calendar.gabrielrevest.software
++ &#96;&#96;&#96;
++ 
++ ### 3. Redémarrer PM2 avec les nouvelles variables
++ 
++ &#96;&#96;&#96;bash
++ pm2 stop calendar-app
++ pm2 delete calendar-app
++ pm2 start ecosystem.config.js
++ pm2 save
++ pm2 logs calendar-app --lines 20
++ &#96;&#96;&#96;
++ 
++ ### 4. Vérifier que l'application fonctionne
++ 
++ &#96;&#96;&#96;bash
++ # Tester l'endpoint de token
++ curl http://localhost:3000/api/calendar/token
++ 
++ # Devrait retourner un JSON avec un token
++ &#96;&#96;&#96;
++ 
++ ## 🔍 Si le lien ne s'affiche toujours pas
++ 
++ Vérifier les logs pour voir s'il y a des erreurs :
++ 
++ &#96;&#96;&#96;bash
++ pm2 logs calendar-app --err --lines 50
++ &#96;&#96;&#96;
++ 
++ Vérifier que l'endpoint &#96;/api/calendar/token&#96; fonctionne en accédant directement à :
++ &#96;https://calendar.gabrielrevest.software/api/calendar/token&#96;
++ 
++ Si cela retourne une erreur 401, c'est que l'authentification Clerk ne fonctionne pas correctement.
++ 
+```
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: src/lib/auth.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="grep">
+<details>
+<summary>Tool use: **grep** • Grep for "NEXTAUTH_SECRET|getSession|next-auth" in "src/app/api" • 44 matches</summary>
+
+Output mode: files_with_matches
+
+
+| File |
+|------|
+| `src/app/api\views\route.ts` |
+| `src/app/api\views\[id]\route.ts` |
+| `src/app/api\user\profile\route.ts` |
+| `src/app/api\trash\[id]\route.ts` |
+| `src/app/api\trash\route.ts` |
+| `src/app/api\trash\[id]\restore\route.ts` |
+| `src/app/api\time-blocks\route.ts` |
+| `src/app/api\time-blocks\[id]\route.ts` |
+| `src/app/api\templates\route.ts` |
+| `src/app/api\tasks\[id]\route.ts` |
+| `src/app/api\tags\route.ts` |
+| `src/app/api\snapshots\route.ts` |
+| `src/app/api\reminders\route.ts` |
+| `src/app/api\projects\[id]\tasks\route.ts` |
+| `src/app/api\projects\[id]\chapters\route.ts` |
+| `src/app/api\projects\[id]\milestones\route.ts` |
+| `src/app/api\notifications\settings\route.ts` |
+| `src/app/api\notes\route.ts` |
+| `src/app/api\notes\[id]\versions\route.ts` |
+| `src/app/api\notes\[id]\route.ts` |
+| `src/app/api\notes\[id]\versions\[versionId]\restore\route.ts` |
+| `src/app/api\milestones\[id]\route.ts` |
+| `src/app/api\journal\route.ts` |
+| `src/app/api\journal\[id]\route.ts` |
+| `src/app/api\import\ical\route.ts` |
+| `src/app/api\habits\route.ts` |
+| `src/app/api\habits\[id]\route.ts` |
+| `src/app/api\habits\[id]\toggle\route.ts` |
+| `src/app/api\filters\[id]\route.ts` |
+| `src/app/api\filters\route.ts` |
+| `src/app/api\export\route.ts` |
+| `src/app/api\events\recurring\route.ts` |
+| `src/app/api\events\[id]\route.ts` |
+| `src/app/api\events\bulk\route.ts` |
+| `src/app/api\events\[id]\duplicate\route.ts` |
+| `src/app/api\categories\route.ts` |
+| `src/app/api\categories\[id]\route.ts` |
+| `src/app/api\calendars\route.ts` |
+| `src/app/api\backup\route.ts` |
+| `src/app/api\attachments\route.ts` |
+| `src/app/api\attachments\[id]\route.ts` |
+| `src/app/api\archive\[id]\unarchive\route.ts` |
+| `src/app/api\archive\route.ts` |
+| `src/app/api\search\route.ts` |
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="search_replace">
+
+<details><summary>Tool use: **search_replace** • Edit file: src/app/api/calendar/token/route.ts</summary>
+
+**Chunk 1**
+Lines added: 1, lines removed: 1
+
+```diff
+@@ -26,5 +26,5 @@
+      try {
+        await prisma.user.update({
+-         where: { id: session.user.id },
++         where: { id: userId },
+          data: { calendarToken: token },
+        })
+```
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+

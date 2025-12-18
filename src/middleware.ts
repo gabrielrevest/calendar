@@ -5,6 +5,7 @@ const isPublicRoute = createRouteMatcher([
   '/',
   '/auth/signin(.*)',
   '/api/webhooks(.*)',
+  '/api/calendar/ical(.*)', // iCal endpoint accessible avec token
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
