@@ -38,6 +38,11 @@ next-env.d.ts
 prisma/*.db
 prisma/*.db-journal
 
+# electron builds
+release/
+dist/
+*.exe
+
 
 
 
