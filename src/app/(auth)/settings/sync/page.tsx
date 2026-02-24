@@ -9,6 +9,32 @@ import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
 import { Copy, RefreshCw, Smartphone, ExternalLink } from 'lucide-react'
 
+function getIcalBaseUrl(): string {
+  const fromEnv = process.env.NEXT_PUBLIC_ICAL_BASE_URL?.trim()
+  if (fromEnv) {
+    return fromEnv.replace(/\/+$/, '')
+  }
+
+  const fallback = 'https://calendar.gabrielrevest.software'
+  if (typeof window === 'undefined') return fallback
+
+  const origin = window.location.origin
+  const hostname = window.location.hostname
+  const isLocalHost =
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0' ||
+    hostname.startsWith('192.168.') ||
+    hostname.startsWith('10.') ||
+    /^172\.(1[6-9]|2\d|3[0-1])\./.test(hostname)
+
+  if (isLocalHost || origin.startsWith('http://')) {
+    return fallback
+  }
+
+  return origin
+}
+
 export default function SyncSettingsPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -33,15 +59,8 @@ export default function SyncSettingsPage() {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['calendar-token'], data)
-      const baseUrl = typeof window !== 'undefined' 
-        ? window.location.origin 
-        : 'https://calendar.gabrielrevest.software'
-      const httpsUrl = baseUrl.startsWith('http://') 
-        ? baseUrl.replace('http://', 'https://')
-        : baseUrl.startsWith('https://') 
-          ? baseUrl 
-          : `https://${baseUrl}`
-      setCalendarUrl(`${httpsUrl}/api/calendar/ical?token=${data.token}`)
+      const baseUrl = getIcalBaseUrl()
+      setCalendarUrl(`${baseUrl}/api/calendar/ical?token=${data.token}`)
       toast({
         title: 'Token régénéré',
         description: 'Un nouveau token a été généré. Mettez à jour la configuration de votre iPhone.',
@@ -59,17 +78,8 @@ export default function SyncSettingsPage() {
   // Générer l'URL de synchronisation
   useEffect(() => {
     if (tokenData?.token) {
-      // Utiliser le domaine HTTPS pour la synchronisation iPhone
-      const baseUrl = typeof window !== 'undefined' 
-        ? window.location.origin 
-        : 'https://calendar.gabrielrevest.software'
-      // S'assurer d'utiliser HTTPS
-      const httpsUrl = baseUrl.startsWith('http://') 
-        ? baseUrl.replace('http://', 'https://')
-        : baseUrl.startsWith('https://') 
-          ? baseUrl 
-          : `https://${baseUrl}`
-      setCalendarUrl(`${httpsUrl}/api/calendar/ical?token=${tokenData.token}`)
+      const baseUrl = getIcalBaseUrl()
+      setCalendarUrl(`${baseUrl}/api/calendar/ical?token=${tokenData.token}`)
     }
   }, [tokenData])
 
@@ -154,20 +164,14 @@ export default function SyncSettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <h3 className="font-semibold">Sur iPhone :</h3>
+            <h3 className="font-semibold">Sur iPhone (recommande) :</h3>
             <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
               <li>Ouvrez l'application <strong>Réglages</strong></li>
               <li>Allez dans <strong>Calendrier</strong> → <strong>Comptes</strong></li>
               <li>Appuyez sur <strong>Ajouter un compte</strong></li>
               <li>Sélectionnez <strong>Autre</strong></li>
-              <li>Choisissez <strong>Ajouter un compte CalDAV</strong></li>
-              <li>Entrez les informations suivantes :
-                <ul className="list-disc list-inside ml-4 mt-1">
-                  <li><strong>Serveur</strong> : Collez l'URL ci-dessus</li>
-                  <li><strong>Nom d'utilisateur</strong> : (peut être laissé vide)</li>
-                  <li><strong>Mot de passe</strong> : (peut être laissé vide)</li>
-                </ul>
-              </li>
+              <li>Choisissez <strong>Ajouter un calendrier abonné</strong></li>
+              <li>Collez l'URL affichée ci-dessus puis validez</li>
               <li>Appuyez sur <strong>Suivant</strong></li>
             </ol>
           </div>
@@ -187,6 +191,13 @@ export default function SyncSettingsPage() {
               <strong>Note de sécurité :</strong> Cette URL contient un token unique qui vous identifie.
               Ne partagez pas cette URL avec d'autres personnes. Si vous pensez que votre token a été compromis,
               régénérez-le en cliquant sur le bouton ci-dessus.
+            </p>
+          </div>
+
+          <div className="bg-muted p-4 rounded-lg">
+            <p className="text-sm">
+              <strong>Important :</strong> si vous etes en local ou sur une IP HTTP, iPhone refusera la synchro.
+              Utilisez un domaine HTTPS et configurez <code>NEXT_PUBLIC_ICAL_BASE_URL</code> si necessaire.
             </p>
           </div>
         </CardContent>

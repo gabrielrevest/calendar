@@ -19,6 +19,25 @@ function escapeText(text: string): string {
     .replace(/\n/g, '\\n')
 }
 
+function withIcalHeaders(body: string, status = 200): NextResponse {
+  return new NextResponse(body, {
+    status,
+    headers: {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Disposition': 'inline; filename="calendrier.ics"',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  })
+}
+
+export async function OPTIONS() {
+  return withIcalHeaders('', 204)
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Vérifier le token dans l'URL (pour l'abonnement iPhone)
@@ -51,30 +70,30 @@ export async function GET(request: NextRequest) {
       orderBy: { startDate: 'asc' },
     })
 
-    let ical = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Calendrier App//FR
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:Mon Calendrier
-X-WR-TIMEZONE:Europe/Paris
-BEGIN:VTIMEZONE
-TZID:Europe/Paris
-BEGIN:DAYLIGHT
-TZOFFSETFROM:+0100
-TZOFFSETTO:+0200
-TZNAME:CEST
-DTSTART:19700329T020000
-RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
-END:DAYLIGHT
-BEGIN:STANDARD
-TZOFFSETFROM:+0200
-TZOFFSETTO:+0100
-TZNAME:CET
-DTSTART:19701025T030000
-RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
-END:STANDARD
-END:VTIMEZONE
+    let ical = `BEGIN:VCALENDAR\r
+VERSION:2.0\r
+PRODID:-//Calendrier App//FR\r
+CALSCALE:GREGORIAN\r
+METHOD:PUBLISH\r
+X-WR-CALNAME:Mon Calendrier\r
+X-WR-TIMEZONE:Europe/Paris\r
+BEGIN:VTIMEZONE\r
+TZID:Europe/Paris\r
+BEGIN:DAYLIGHT\r
+TZOFFSETFROM:+0100\r
+TZOFFSETTO:+0200\r
+TZNAME:CEST\r
+DTSTART:19700329T020000\r
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU\r
+END:DAYLIGHT\r
+BEGIN:STANDARD\r
+TZOFFSETFROM:+0200\r
+TZOFFSETTO:+0100\r
+TZNAME:CET\r
+DTSTART:19701025T030000\r
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU\r
+END:STANDARD\r
+END:VTIMEZONE\r
 `
 
     for (const event of events) {
@@ -82,53 +101,43 @@ END:VTIMEZONE
       const created = formatDateForIcal(new Date(event.createdAt))
       const modified = formatDateForIcal(new Date(event.updatedAt))
 
-      ical += `BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${modified}
+      ical += `BEGIN:VEVENT\r
+UID:${uid}\r
+DTSTAMP:${modified}\r
 `
 
       // Gérer les événements sur toute la journée
       if (event.allDay) {
-        ical += `DTSTART;VALUE=DATE:${formatDateAllDay(new Date(event.startDate))}
-DTEND;VALUE=DATE:${formatDateAllDay(new Date(event.endDate))}
+        ical += `DTSTART;VALUE=DATE:${formatDateAllDay(new Date(event.startDate))}\r
+DTEND;VALUE=DATE:${formatDateAllDay(new Date(event.endDate))}\r
 `
       } else {
-        ical += `DTSTART;TZID=Europe/Paris:${formatDateForIcal(new Date(event.startDate))}
-DTEND;TZID=Europe/Paris:${formatDateForIcal(new Date(event.endDate))}
+        ical += `DTSTART;TZID=Europe/Paris:${formatDateForIcal(new Date(event.startDate))}\r
+DTEND;TZID=Europe/Paris:${formatDateForIcal(new Date(event.endDate))}\r
 `
       }
 
-      ical += `SUMMARY:${escapeText(event.title)}
+      ical += `SUMMARY:${escapeText(event.title)}\r
 `
 
       if (event.description) {
-        ical += `DESCRIPTION:${escapeText(event.description)}
+        ical += `DESCRIPTION:${escapeText(event.description)}\r
 `
       }
 
       if (event.location) {
-        ical += `LOCATION:${escapeText(event.location)}
+        ical += `LOCATION:${escapeText(event.location)}\r
 `
       }
 
-      ical += `CREATED:${created}
-LAST-MODIFIED:${modified}
-END:VEVENT
+      ical += `CREATED:${created}\r
+LAST-MODIFIED:${modified}\r
+END:VEVENT\r
 `
     }
 
-    ical += 'END:VCALENDAR'
-
-    return new NextResponse(ical, {
-      headers: {
-        'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': 'inline; filename="calendrier.ics"',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'X-Content-Type-Options': 'nosniff',
-      },
-    })
+    ical += 'END:VCALENDAR\r\n'
+    return withIcalHeaders(ical)
   } catch (error) {
     console.error('Error generating iCal:', error)
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
