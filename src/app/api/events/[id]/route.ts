@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(
@@ -7,15 +7,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { id } = await params
 
     const event = await prisma.event.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId },
       include: {
         category: true,
         tags: true,
@@ -39,8 +39,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -48,7 +48,7 @@ export async function PUT(
     const body = await request.json()
 
     const existingEvent = await prisma.event.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId },
     })
 
     if (!existingEvent) {
@@ -65,7 +65,7 @@ export async function PUT(
     if (categoryId && categoryId !== '' && categoryId !== 'null' && categoryId !== 'undefined') {
       try {
         const category = await prisma.category.findFirst({
-          where: { id: categoryId, userId: session.user.id },
+          where: { id: categoryId, userId },
         })
         if (category) {
           validCategoryId = categoryId
@@ -82,7 +82,7 @@ export async function PUT(
         const existingTags = await prisma.tag.findMany({
           where: {
             id: { in: tagIds },
-            userId: session.user.id,
+            userId,
           },
           select: { id: true },
         })
@@ -121,7 +121,7 @@ export async function PUT(
       updateData.reminders = {
         create: reminders.map((minutes: number) => ({ 
           minutesBefore: minutes,
-          userId: session.user.id,
+          userId,
         })),
       }
     }
@@ -148,15 +148,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { id } = await params
 
     const existingEvent = await prisma.event.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId },
     })
 
     if (!existingEvent) {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(
@@ -7,15 +7,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { id } = await params
 
     const note = await prisma.note.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId },
       include: {
         category: true,
         tags: true,
@@ -39,8 +39,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -48,7 +48,7 @@ export async function PUT(
     const body = await request.json()
 
     const existingNote = await prisma.note.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId },
     })
 
     if (!existingNote) {
@@ -87,15 +87,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const { id } = await params
 
     const existingNote = await prisma.note.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId },
     })
 
     if (!existingNote) {

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     try {
       entry = await prisma.journalEntry.findFirst({
         where: {
-          userId: session.user.id,
+          userId,
           date: new Date(date),
         },
       })
@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     // Vérifier si une entrée existe déjà pour cette date
     const existing = await prisma.journalEntry.findFirst({
       where: {
-        userId: session.user.id,
+        userId,
         date: entryDate,
       },
     })
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     } else {
       entry = await prisma.journalEntry.create({
         data: {
-          userId: session.user.id,
+          userId,
           date: new Date(date),
           content,
         },

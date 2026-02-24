@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Recherche dans les événements
     const events = await prisma.event.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         OR: [
           { title: { contains: query, mode: 'insensitive' } },
           { description: { contains: query, mode: 'insensitive' } },
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     // Recherche dans les notes
     const notes = await prisma.note.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         OR: [
           { title: { contains: query, mode: 'insensitive' } },
           { content: { contains: query, mode: 'insensitive' } },
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     // Recherche dans les projets
     const projects = await prisma.project.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { description: { contains: query, mode: 'insensitive' } },
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
     // Recherche dans le journal
     const journalEntries = await prisma.journalEntry.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         content: { contains: query, mode: 'insensitive' },
       },
       take: 10,

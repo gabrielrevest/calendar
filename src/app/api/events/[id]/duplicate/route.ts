@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(
@@ -7,8 +7,8 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -20,7 +20,7 @@ export async function POST(
       include: { tags: true, reminders: true },
     })
 
-    if (!original || original.userId !== session.user.id) {
+    if (!original || original.userId !== userId) {
       return NextResponse.json({ error: 'Non trouvé' }, { status: 404 })
     }
 
@@ -32,7 +32,7 @@ export async function POST(
         endDate: original.endDate,
         allDay: original.allDay,
         location: original.location,
-        userId: session.user.id,
+        userId,
         categoryId: original.categoryId,
         ...(includeRelations && {
           tags: {

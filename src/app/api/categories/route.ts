@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const categories = await prisma.category.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       orderBy: { name: 'asc' },
     })
 
@@ -24,8 +24,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         name: body.name.trim(),
         type: body.type,
         color: body.color || null,
-        userId: session.user.id,
+        userId,
       },
     })
 

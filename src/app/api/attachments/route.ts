@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes)
 
     // Créer le dossier uploads si nécessaire
-    const uploadsDir = join(process.cwd(), 'uploads', session.user.id)
+    const uploadsDir = join(process.cwd(), 'uploads', userId)
     if (!existsSync(uploadsDir)) {
       await mkdir(uploadsDir, { recursive: true })
     }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const attachment = {
       id: `att-${timestamp}`,
       name: file.name,
-      url: `/api/attachments/${session.user.id}/${filename}`,
+      url: `/api/attachments/${userId}/${filename}`,
       size: file.size,
       type: file.type,
     }

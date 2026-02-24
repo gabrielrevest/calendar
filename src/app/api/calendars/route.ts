@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const calendars = await prisma.calendar.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       orderBy: { createdAt: 'asc' },
     })
 
@@ -27,7 +27,7 @@ export async function GET() {
           prisma.calendar.create({
             data: {
               ...cal,
-              userId: session.user.id,
+              userId,
             },
           })
         )
@@ -45,8 +45,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       data: {
         name: name.trim(),
         color: color || '#3B82F6',
-        userId: session.user.id,
+        userId,
       },
     })
 

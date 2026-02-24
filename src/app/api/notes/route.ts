@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
     const notes = await prisma.note.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       include: {
         category: true,
         tags: true,
@@ -29,8 +29,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     // Vérifier que l'utilisateur existe (PrismaAdapter le crée automatiquement lors de la connexion)
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { id: true },
     })
     if (!user) {
@@ -51,12 +51,12 @@ export async function POST(request: Request) {
     if (categoryId && categoryId !== '' && categoryId !== 'null' && categoryId !== 'undefined') {
       try {
         const category = await prisma.category.findFirst({
-          where: { id: categoryId, userId: session.user.id },
+          where: { id: categoryId, userId },
         })
         if (category) {
           validCategoryId = categoryId
         } else {
-          console.log(`Category ${categoryId} not found for user ${session.user.id}`)
+          console.log(`Category ${categoryId} not found for user ${userId}`)
         }
       } catch (error) {
         console.error('Error validating category:', error)
@@ -70,14 +70,14 @@ export async function POST(request: Request) {
         const project = await prisma.project.findFirst({
           where: { 
             id: projectId, 
-            userId: session.user.id 
+            userId 
           },
           select: { id: true },
         })
         if (project) {
           validProjectId = projectId
         } else {
-          console.log(`Project ${projectId} not found for user ${session.user.id}`)
+          console.log(`Project ${projectId} not found for user ${userId}`)
         }
       } catch (error) {
         console.error('Error validating project:', error)
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
         const existingTags = await prisma.tag.findMany({
           where: {
             id: { in: tagIds },
-            userId: session.user.id,
+            userId,
           },
           select: { id: true },
         })
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       title: noteData.title.trim(),
       content: noteData.content || '',
       linkedDate: noteData.linkedDate ? new Date(noteData.linkedDate) : null,
-      userId: session.user.id,
+      userId,
     }
 
     // Ajouter categoryId seulement si valide

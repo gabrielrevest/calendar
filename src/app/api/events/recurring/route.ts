@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 import { addDays, addWeeks, addMonths, addYears, startOfDay, isSameDay } from 'date-fns'
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const { eventId, startDate, endDate } = body
 
     const parentEvent = await prisma.event.findFirst({
-      where: { id: eventId, userId: session.user.id },
+      where: { id: eventId, userId },
     })
 
     if (!parentEvent || !parentEvent.isRecurring) {
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         endDate: eventEnd,
         allDay: parentEvent.allDay,
         location: parentEvent.location,
-        userId: session.user.id,
+        userId,
         isRecurring: false,
         parentEventId: parentEvent.id,
       })

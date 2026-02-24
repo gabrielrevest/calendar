@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
+import { getCurrentUserId } from '@/lib/auth-clerk'
 import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession()
-    if (!session?.user?.id) {
+    const userId = await getCurrentUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -20,21 +20,21 @@ export async function GET(request: NextRequest) {
 
     if (includeEvents) {
       data.events = await prisma.event.findMany({
-        where: { userId: session.user.id },
+        where: { userId },
         include: { category: true, tags: true },
       })
     }
 
     if (includeProjects) {
       data.projects = await prisma.project.findMany({
-        where: { userId: session.user.id },
+        where: { userId },
         include: { category: true, tags: true, tasks: true, chapters: true },
       })
     }
 
     if (includeNotes) {
       data.notes = await prisma.note.findMany({
-        where: { userId: session.user.id },
+        where: { userId },
         include: { category: true, tags: true },
       })
     }
